@@ -1,0 +1,51 @@
+[tasks.format]
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--", "--emit=files"]
+
+[tasks.clean]
+command = "cargo"
+args = ["clean"]
+
+# Remove exported wasm a.k.a. .wasm_add
+# may need cargo install fd-find
+[tasks.clean-extra]
+command = "fd"
+args = ["-e", "wasm_add", "--exec", "rm"]
+
+[tasks.clippy]
+command = "cargo"
+args = ["clippy", "--target", "wasm32-unknown-unknown"]
+
+[tasks.build]
+dependencies = ["clippy"]
+command = "cargo"
+args = ["build", "--target", "wasm32-unknown-unknown"]
+
+[tasks.inspect]
+dependencies = ["build"]
+command = "wasmer"
+args = [
+    "inspect",
+    "./target/wasm32-unknown-unknown/debug/massa_rust_sc_examples.wasm",
+]
+
+[tasks.export]
+dependencies = ["build"]
+command = "wasmv1_transform"
+args = [
+    "./target/wasm32-unknown-unknown/debug/massa_rust_sc_examples.wasm",
+    "add",
+]
+
+[tasks.list-wasm]
+shell_runner = "@shell"
+script = '''
+echo "** wasmv1 files:"
+find . -name "*.wasm_add" -exec echo "    {}" \;
+echo ""
+'''
+
+[tasks.wasm]
+dependencies = ["clean-extra", "inspect", "export"]
+run_task = "list-wasm"
