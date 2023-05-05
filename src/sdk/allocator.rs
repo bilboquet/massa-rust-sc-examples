@@ -10,7 +10,7 @@ fn myalloc(size: u32) -> u32 {
         #[cfg(test)]
         {
             use log::warn;
-            
+
             if !IS_SHARED_MEM_CONSUMED {
                 warn!("SHARED_MEM has not been consumed yet, possible memory leak");
             }

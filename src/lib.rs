@@ -32,24 +32,10 @@ use crate::sdk::encode_length_prefixed;
 pub fn call_echo(arg_ptr: u32) -> u32 {
     let arg = get_parameters(arg_ptr);
 
-    let data = arg;
+    let ret = echo(arg);
 
     // data MUST be returned this way
-    return encode_length_prefixed(data);
-
-    dbg!(1);
-    // get the parameters pointed by arg_ptr
-    let arg: Vec<u8> = get_parameters(encode_length_prefixed(data));
-    // deserialize the parameters using protobuf
-    let arg: Vec<u8> = Message::decode(arg.as_slice()).unwrap();
-
-    // TODO: deserialize the arguments with protobuf
-    echo(arg);
-    // alert("");
-    // println!("next_int2: {}", value);
-
-    // fake return
-    0
+    encode_length_prefixed(ret)
 }
 
 #[test]

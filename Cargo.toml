@@ -11,6 +11,8 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 wasm-bindgen = "0.2.84"
 prost = "0.11.8"        # specify the exact version to ensure determinism
+cfg-if = "1.0.0"
+# mockall = { version = "0.11.4", features = ["nightly"] }
 
 [build-dependencies]
 prost-build = "0.11.8" # specify exact version to ensure determinism
