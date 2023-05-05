@@ -17,7 +17,9 @@
 
 mod sdk;
 use prost::Message;
-use sdk::{abi::echo, get_parameters};
+// use proto::massa::abi::v1 as proto;
+
+use sdk::{abis::echo, get_parameters};
 
 use crate::sdk::encode_length_prefixed;
 
@@ -28,10 +30,8 @@ use crate::sdk::encode_length_prefixed;
 // specify the function name as it is seems from the outside
 #[export_name = "call_echo"]
 pub fn call_echo(arg_ptr: u32) -> u32 {
-
     let arg = get_parameters(arg_ptr);
 
-    
     let data = arg;
 
     // data MUST be returned this way
@@ -44,7 +44,7 @@ pub fn call_echo(arg_ptr: u32) -> u32 {
     let arg: Vec<u8> = Message::decode(arg.as_slice()).unwrap();
 
     // TODO: deserialize the arguments with protobuf
-    // echo(arg);
+    echo(arg);
     // alert("");
     // println!("next_int2: {}", value);
 
@@ -52,28 +52,21 @@ pub fn call_echo(arg_ptr: u32) -> u32 {
     0
 }
 
-
 #[test]
 fn test_call_echo() {
-    // create a TestRequest instance
-use crate::sdk::proto::TestRequest;
+    let test_msg = "test".to_string().into_bytes();
 
-let request = TestRequest {
-    test_field: "test".to_string(),
-};
+    // simulate arguments passing from the host to the SC
+    let buf_ptr = sdk::test::host_write_buffer(&test_msg);
 
-// encode the TestRequest instance using protobuf
-let mut buf = Vec::new();
-request.encode(&mut buf).unwrap();
+    // call the SC function and get the result
+    let result_ptr = call_echo(buf_ptr);
 
-// pass the encoded TestRequest as argument to the SC function
-let arg_ptr = sdk::store_data(&buf);
+    // simulate reading the result from the SC
+    let result = sdk::test::host_read_buffer(result_ptr);
 
-// call the SC function and get the result
-let result_ptr = call_echo(arg_ptr);
+    // decode the result from the SC
+    let result = String::from_utf8_lossy(&result);
 
-// decode the result from the SC function using protobuf
-let result_buf = sdk::get_data(result_ptr);
-let result = TestResponse::decode(result_buf.as_slice()).unwrap();
-    call_echo(1);
+    assert_eq!(result, "test");
 }

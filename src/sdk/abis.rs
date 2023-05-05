@@ -1,3 +1,8 @@
+
+// Include the `abi` module, which is generated from the proto files.
+use super::abi::proto as proto;
+
+
 // ******************************************************
 // Function from the abi used by the SC
 

@@ -69,7 +69,7 @@ VSCode integration
 
 ```json
 {
-    // "rust-analyzer.rust.features": ["prost-build"], // Enables the prost-build feature for the Rust Analyzer extension.
+    // "rust-analyzer.cargo.features": ["prost-build"], // Enables the prost-build feature for the Rust Analyzer extension.
     "rust-analyzer.procMacro.enable": true,  // Enables Rust macro support for the Rust Analyzer extension.
     "rust-analyzer.cargo.buildScripts.enable": true,  // Enables cargo build scripts for the Rust Analyzer extension.
     "protoc": {  // Specifies the configuration for the protoc plugin.
