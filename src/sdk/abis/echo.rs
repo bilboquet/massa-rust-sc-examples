@@ -2,10 +2,9 @@ use cfg_if::cfg_if;
 use prost::Message;
 
 // Include the `abi` module, which is generated from the proto files.
-use super::{
-    abi::proto::massa::abi::v1::{TestRequest, TestResponse},
-    encode_length_prefixed, get_parameters,
-};
+use crate::sdk::abi::proto::massa::abi::v1::{TestRequest, TestResponse};
+use crate::sdk::allocator::encode_length_prefixed;
+use crate::sdk::allocator::get_parameters;
 
 // ******************************************************
 // Function from the abi used by the SC
@@ -17,7 +16,7 @@ use super::{
 // specify the function name as it is in the abi
 // CHECK: extern "C" implies no_mangle
 extern "C" {
-    // maybe use to "rename" a function
+    // may be use to "rename" a function
     // #[link_name = "actual_symbol_name"]
     fn abi_echo(arg: u32) -> u32;
 }
@@ -46,8 +45,8 @@ fn impl_echo(arg: Vec<u8>) -> Vec<u8> {
 }
 
 // ******************************************************
-// mocked version of the abi so one can dev and write tests without the need to
-// call the host
+// mocked version of the abi so one can dev and write tests without the need
+// to call the host
 cfg_if! {
     if #[cfg(test)] {
         // Should we leave it up to the user to implement the mock?

@@ -16,12 +16,10 @@
 // }
 
 mod sdk;
-use prost::Message;
-// use proto::massa::abi::v1 as proto;
 
-use sdk::{abis::echo, get_parameters};
-
+use crate::sdk::abis::log::log;
 use crate::sdk::encode_length_prefixed;
+use sdk::{abis::echo::echo, get_parameters};
 
 // ******************************************************
 // Function exposed by the SC low level interface to the host
@@ -31,7 +29,10 @@ use crate::sdk::encode_length_prefixed;
 #[export_name = "call_echo"]
 pub fn call_echo(arg_ptr: u32) -> u32 {
     let arg = get_parameters(arg_ptr);
-
+    log("call_echo".to_string());
+    // assert_eq!(arg.len(), 4);
+    // assert_eq!(arg, "test".to_string().into_bytes());
+    let arg = "test".to_string().into_bytes();
     let ret = echo(arg);
 
     // data MUST be returned this way
