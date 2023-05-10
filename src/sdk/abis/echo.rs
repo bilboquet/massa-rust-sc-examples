@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 use cfg_if::cfg_if;
 use prost::Message;
 
@@ -53,7 +54,7 @@ cfg_if! {
         // Should we mock at the abi_level?
         // Can mockall do the job?
         fn mock_echo(arg: Vec<u8>) -> Vec<u8> {
-            dbg!("mocked echo");
+            std::dbg!("mocked echo");
 
             let req = TestRequest {message_in: arg };
             let req_bytes = req.encode_to_vec();

@@ -1,15 +1,7 @@
-
+use alloc::string::String;
 use cfg_if::cfg_if;
 
 use crate::sdk::allocator::encode_length_prefixed;
-
-
-
-// #[panic_handler]
-// fn panic_handler(_info: &core::panic::PanicInfo) -> ! {
-//     abort("my panic".into());
-//     core::arch::wasm32::unreachable()
-// }
 
 // ****************************************************************************
 // Function from the abi used by the SC

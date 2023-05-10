@@ -1,26 +1,6 @@
-// ****************************************************************************
-// section related to panic hook
-// ****************************************************************************
-// set_panick_hook() has to be setup at runtime
-// let's use a static_lazy global variable to trigger the setup
-// and acces it in __alloc as we know it will be called before any other
-// function
+use alloc::vec::Vec;
 
-use lazy_static::lazy_static;
-
-lazy_static! {
-    static ref PANIC_HOOK: bool = init_panic_handler();
-}
-fn init_panic_handler() -> bool {
-    std::panic::set_hook(Box::new(|panic_info| {
-        super::abis::abort::abort(panic_info.to_string());
-    }));
-    true
-}
-
-// ****************************************************************************
-
-static mut SHARED_MEM: Vec<u8> = vec![];
+static mut SHARED_MEM: Vec<u8> = Vec::new();
 
 #[cfg(test)]
 static mut IS_SHARED_MEM_CONSUMED: bool = true;
@@ -28,11 +8,6 @@ static mut IS_SHARED_MEM_CONSUMED: bool = true;
 #[no_mangle]
 #[export_name = "__alloc"]
 fn myalloc(size: u32) -> u32 {
-    // trigger the setup of the panic hook
-    if *PANIC_HOOK {
-        // do nothing
-    }
-
     unsafe {
         #[cfg(test)]
         {
@@ -44,10 +19,7 @@ fn myalloc(size: u32) -> u32 {
             IS_SHARED_MEM_CONSUMED = false;
         }
 
-        // allocate AND fill memory with 0
-        SHARED_MEM = vec![0u8; size as usize];
-        // clear the buffer to extend() writes at the biginning
-        SHARED_MEM.clear();
+        SHARED_MEM = Vec::with_capacity(size as usize);
         SHARED_MEM.as_ptr() as u32
     }
 }
@@ -78,7 +50,9 @@ pub(crate) fn get_parameters(arg_ptr: u32) -> Vec<u8> {
         {
             IS_SHARED_MEM_CONSUMED = true;
         }
-        std::mem::take(&mut SHARED_MEM)
+
+        core::mem::replace(&mut SHARED_MEM, Vec::new())
+        // std::mem::take(&mut SHARED_MEM)
     }
 }
 

@@ -20,6 +20,7 @@ mod tonic {
 
         // Configure and compile the protobuf ABI
         prost_build::Config::new()
+            .btree_map(&["."])
             .include_file("_includes.rs")
             .out_dir("src/sdk/abi/proto")
             .compile_protos(&protos, &["proto/massa/abi/v1/"])

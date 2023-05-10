@@ -1,9 +1,54 @@
 // ****************************************************************************
 
 // TODO: move in root module of the sdk
-// needet to use #[panic_handler]
-// #![no_std]
+// needed to use #[panic_handler]
+#![no_std]
+// #![feature(alloc_error_handler)]
 
+// as we go no_std we need to import alloc
+extern crate alloc;
+use alloc::{format, string::ToString};
+
+use cfg_if::cfg_if;
+
+cfg_if! {
+    if #[cfg(test)] {
+    } else {
+        use sdk::abis::abort::abort;
+        #[panic_handler]
+        fn panic_handler(_info: &core::panic::PanicInfo) -> ! {
+            abort("my panic".into());
+            unreachable!()
+        }
+    }
+}
+
+// #[alloc_error_handler]
+// fn alloc_error_handler(layout: core::alloc::Layout) -> ! {
+//     panic!("memory allocation of {} bytes failed", layout.size())
+// }
+
+// ****************************************************************************
+// try dlmalloc allocator, the default allocator when target is
+// wasm32-unknown-unknown
+// ****************************************************************************
+
+#[global_allocator]
+static A: dlmalloc::GlobalDlmalloc = dlmalloc::GlobalDlmalloc;
+
+
+// ****************************************************************************
+// try lol_alloc allocator
+// ****************************************************************************
+// extern crate alloc;
+
+// use lol_alloc::{AssumeSingleThreaded, FreeListAllocator};
+
+// // SAFETY: This application is single threaded, so using AssumeSingleThreaded
+// is // allowed.
+// #[global_allocator]
+// static ALLOCATOR: AssumeSingleThreaded<FreeListAllocator> =
+//     unsafe { AssumeSingleThreaded::new(FreeListAllocator::new()) };
 // ****************************************************************************
 
 #[no_mangle]
@@ -13,11 +58,9 @@ pub extern "C" fn main(_arg: i32) -> i32 {
 
 mod sdk;
 
-use crate::sdk::abis::log::log;
-use crate::sdk::encode_length_prefixed;
 use sdk::{
-    abis::{abort::abort, echo::echo},
-    get_parameters,
+    abis::{echo::echo, log::log},
+    encode_length_prefixed, get_parameters,
 };
 
 // ****************************************************************************
@@ -29,8 +72,7 @@ use sdk::{
 pub fn call_echo(arg_ptr: u32) -> u32 {
     let arg = get_parameters(arg_ptr);
     log("call_echo".to_string());
-    // panic!(" ** here I am **");
-    abort("here I am".to_owned());
+    panic!(" ** here I am **");
 
     // assert_eq!(arg.len(), 4);
     log(format!("arg len: {}", arg.len()));
@@ -58,7 +100,7 @@ fn test_call_echo() {
     let result = sdk::test::host_read_buffer(result_ptr);
 
     // decode the result from the SC
-    let result = String::from_utf8_lossy(&result);
+    let result = alloc::string::String::from_utf8_lossy(&result);
 
     assert_eq!(result, "test");
 }

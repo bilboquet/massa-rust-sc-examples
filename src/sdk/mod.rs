@@ -1,6 +1,13 @@
 // As of may 2023, a good documentation can be found here:
 // https://surma.dev/things/rust-to-webassembly/
 // and https://rustwasm.github.io/docs/book/reference/debugging.html
+//
+// ** /!\ ** wee_alloc has a leak and is more or less deprecated, lol_alloc
+// seems to be the best option for small size.
+// For now, I will use the default allocator which is
+// dlmalloc: https://docs.rs/dlmalloc/latest/dlmalloc/
+
+use alloc::vec::Vec;
 
 mod abi;
 pub(crate) mod abis;
