@@ -1,27 +1,26 @@
-// use wasm_bindgen::prelude::*;
+// ****************************************************************************
 
-// #[wasm_bindgen]
-// extern "C" {
-//     pub fn alert(s: &str);
-// }
+// TODO: move in root module of the sdk
+// needet to use #[panic_handler]
+// #![no_std]
 
-// #[wasm_bindgen]
-// pub fn greet(name: &str) {
-//     alert(&format!("Hello, {}!", name));
-// }
+// ****************************************************************************
 
-// #[wasm_bindgen]
-// pub fn next_int(value: u32) {
-//     println!("next_int2: {}", value);
-// }
+#[no_mangle]
+pub extern "C" fn main(_arg: i32) -> i32 {
+    panic!("end");
+}
 
 mod sdk;
 
 use crate::sdk::abis::log::log;
 use crate::sdk::encode_length_prefixed;
-use sdk::{abis::echo::echo, get_parameters};
+use sdk::{
+    abis::{abort::abort, echo::echo},
+    get_parameters,
+};
 
-// ******************************************************
+// ****************************************************************************
 // Function exposed by the SC low level interface to the host
 // CHECK: is it required? (as we use export_name)
 #[no_mangle]
@@ -30,10 +29,16 @@ use sdk::{abis::echo::echo, get_parameters};
 pub fn call_echo(arg_ptr: u32) -> u32 {
     let arg = get_parameters(arg_ptr);
     log("call_echo".to_string());
+    // panic!(" ** here I am **");
+    abort("here I am".to_owned());
+
     // assert_eq!(arg.len(), 4);
+    log(format!("arg len: {}", arg.len()));
+
     // assert_eq!(arg, "test".to_string().into_bytes());
     let arg = "test".to_string().into_bytes();
     let ret = echo(arg);
+    log(format!("ret len: {}", ret.len()));
 
     // data MUST be returned this way
     encode_length_prefixed(ret)

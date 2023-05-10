@@ -1,8 +1,10 @@
+// As of may 2023, a good documentation can be found here:
+// https://surma.dev/things/rust-to-webassembly/
+// and https://rustwasm.github.io/docs/book/reference/debugging.html
+
 mod abi;
 pub(crate) mod abis;
 mod allocator;
-
-// pub use prost::Message;
 
 pub(crate) fn get_parameters(arg_ptr: u32) -> Vec<u8> {
     allocator::get_parameters(arg_ptr)

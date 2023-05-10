@@ -1,3 +1,25 @@
+// ****************************************************************************
+// section related to panic hook
+// ****************************************************************************
+// set_panick_hook() has to be setup at runtime
+// let's use a static_lazy global variable to trigger the setup
+// and acces it in __alloc as we know it will be called before any other
+// function
+
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref PANIC_HOOK: bool = init_panic_handler();
+}
+fn init_panic_handler() -> bool {
+    std::panic::set_hook(Box::new(|panic_info| {
+        super::abis::abort::abort(panic_info.to_string());
+    }));
+    true
+}
+
+// ****************************************************************************
+
 static mut SHARED_MEM: Vec<u8> = vec![];
 
 #[cfg(test)]
@@ -6,6 +28,11 @@ static mut IS_SHARED_MEM_CONSUMED: bool = true;
 #[no_mangle]
 #[export_name = "__alloc"]
 fn myalloc(size: u32) -> u32 {
+    // trigger the setup of the panic hook
+    if *PANIC_HOOK {
+        // do nothing
+    }
+
     unsafe {
         #[cfg(test)]
         {

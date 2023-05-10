@@ -6,7 +6,7 @@ use crate::sdk::abi::proto::massa::abi::v1::LogRequest;
 use crate::sdk::allocator::encode_length_prefixed;
 use crate::sdk::allocator::get_parameters;
 
-// ******************************************************
+// ****************************************************************************
 // Function from the abi used by the SC
 
 // Interface between the sdk and the abi
@@ -21,7 +21,7 @@ extern "C" {
     fn abi_log(arg: u32) -> u32;
 }
 
-// ******************************************************
+// ****************************************************************************
 
 // Interface between the sdk and the SC i.e. seen by the user
 // Wrapped function to "hide" unsafe and manage serialize/deserialize of the
@@ -37,7 +37,7 @@ fn impl_log(arg: String) {
     unsafe { abi_log(arg_ptr) };
 }
 
-// ******************************************************
+// ****************************************************************************
 // mocked version of the abi so one can dev and write tests without the need
 // to call the host
 cfg_if! {
