@@ -1,7 +1,19 @@
-use alloc::string::String;
-use cfg_if::cfg_if;
+use crate::sdk::alloc::string::String;
 
 use crate::sdk::allocator::encode_length_prefixed;
+
+// ****************************************************************************
+// Override the panic handler to call the abort function from the abi
+// ****************************************************************************
+
+#[cfg(not(test))]
+#[panic_handler]
+fn panic_handler(info: &core::panic::PanicInfo) -> ! {
+    use crate::sdk::alloc::format;
+
+    impl_abort(format!("Panic occurred: {:?}", info));
+    unreachable!()
+}
 
 // ****************************************************************************
 // Function from the abi used by the SC
@@ -19,7 +31,6 @@ extern "C" {
 }
 
 // ****************************************************************************
-
 // Interface between the sdk and the SC i.e. seen by the user
 // Wrapped function to "hide" unsafe and manage serialize/deserialize of the
 // parameters
@@ -33,26 +44,7 @@ fn impl_abort(arg: String) {
 }
 
 // ****************************************************************************
-// mocked version of the abi so one can dev and write tests without the need
-// to call the host
-cfg_if! {
-    if #[cfg(test)] {
-        // Should we leave it up to the user to implement the mock?
-        // Should we mock at the abi_level?
-        // Can mockall do the job?
-        fn mock_abort(arg: String)  {
-            dbg!("mocked abort");
-        }
-    }
-}
-
-pub fn abort(arg: String) {
-    cfg_if! {
-        if #[cfg(test)]    {
-            mock_abort(arg)
-        }
-         else {
-            impl_abort(arg)
-        }
-    }
-}
+// ** mocked version of the abi **
+// it has no sense for abort as for testings we will use the default
+// panic_handler
+// ****************************************************************************

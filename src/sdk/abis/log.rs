@@ -1,4 +1,4 @@
-use alloc::string::String;
+use crate::sdk::alloc::string::String;
 
 use cfg_if::cfg_if;
 use prost::Message;
@@ -44,13 +44,14 @@ fn impl_log(arg: String) {
 // to call the host
 cfg_if! {
     if #[cfg(test)] {
+        extern crate std;
         use std::println;
 
         // Should we leave it up to the user to implement the mock?
         // Should we mock at the abi_level?
         // Can mockall do the job?
         fn mock_log(arg: String)  {
-            println!(arg);
+            println!("{}", arg);
         }
     }
 }

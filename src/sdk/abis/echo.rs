@@ -1,4 +1,4 @@
-use alloc::vec::Vec;
+use crate::sdk::alloc::vec::Vec;
 use cfg_if::cfg_if;
 use prost::Message;
 
@@ -50,11 +50,14 @@ fn impl_echo(arg: Vec<u8>) -> Vec<u8> {
 // to call the host
 cfg_if! {
     if #[cfg(test)] {
+        extern crate std;
+        use std::dbg;
+
         // Should we leave it up to the user to implement the mock?
         // Should we mock at the abi_level?
         // Can mockall do the job?
         fn mock_echo(arg: Vec<u8>) -> Vec<u8> {
-            std::dbg!("mocked echo");
+            dbg!("mocked echo");
 
             let req = TestRequest {message_in: arg };
             let req_bytes = req.encode_to_vec();

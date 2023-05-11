@@ -1,3 +1,32 @@
+// ****************************************************************************
+// As we go no_std we need to import alloc and use a global allocator
+// Using dlmalloc allocator, the default allocator when target is
+// wasm32-unknown-unknown
+// ****************************************************************************
+extern crate alloc;
+
+#[global_allocator]
+static A: dlmalloc::GlobalDlmalloc = dlmalloc::GlobalDlmalloc;
+
+// ****************************************************************************
+// may try lol_alloc allocator
+// ****************************************************************************
+// extern crate alloc;
+
+// use lol_alloc::{AssumeSingleThreaded, FreeListAllocator};
+
+// // SAFETY: This application is single threaded, so using AssumeSingleThreaded
+// is // allowed.
+// #[global_allocator]
+// static ALLOCATOR: AssumeSingleThreaded<FreeListAllocator> =
+//     unsafe { AssumeSingleThreaded::new(FreeListAllocator::new()) };
+// ****************************************************************************
+
+// ****************************************************************************
+// __alloc function used by to host to allocate memory for for exchange with the
+// wasm module
+// ****************************************************************************
+
 use alloc::vec::Vec;
 
 static mut SHARED_MEM: Vec<u8> = Vec::new();
@@ -28,7 +57,7 @@ fn get_shared_mem_as_u32() -> u32 {
     unsafe { SHARED_MEM.as_ptr() as u32 }
 }
 
-pub(crate) fn get_parameters(arg_ptr: u32) -> Vec<u8> {
+pub(super) fn get_parameters(arg_ptr: u32) -> Vec<u8> {
     // This is a check to ensure that the memory is not consumed twice.
     // Only useful for tests while developing.
     // The assert below has a broader scope but is less explicit.
@@ -51,12 +80,11 @@ pub(crate) fn get_parameters(arg_ptr: u32) -> Vec<u8> {
             IS_SHARED_MEM_CONSUMED = true;
         }
 
-        core::mem::replace(&mut SHARED_MEM, Vec::new())
-        // std::mem::take(&mut SHARED_MEM)
+        core::mem::take(&mut SHARED_MEM)
     }
 }
 
-pub(crate) fn encode_length_prefixed(data: Vec<u8>) -> u32 {
+pub(super) fn encode_length_prefixed(data: Vec<u8>) -> u32 {
     let data_len: u32 = data.len().try_into().expect("size fit in u32");
     let buf_len: u32 = data_len + 4;
 
@@ -75,6 +103,7 @@ pub(crate) fn encode_length_prefixed(data: Vec<u8>) -> u32 {
 #[cfg(test)]
 // The below functions will only be compiled and available during tests,
 pub(super) mod test {
+    use super::alloc::vec::Vec;
     use crate::sdk::allocator::{get_parameters, myalloc, SHARED_MEM};
 
     #[cfg(test)]

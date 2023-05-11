@@ -7,7 +7,12 @@
 // For now, I will use the default allocator which is
 // dlmalloc: https://docs.rs/dlmalloc/latest/dlmalloc/
 
-use alloc::vec::Vec;
+extern crate alloc;
+pub use alloc::{
+    format,
+    string::{String, ToString},
+    vec::Vec,
+};
 
 mod abi;
 pub(crate) mod abis;
@@ -21,8 +26,12 @@ pub(crate) fn encode_length_prefixed(data: Vec<u8>) -> u32 {
     allocator::encode_length_prefixed(data)
 }
 
+// ****************************************************************************
+// a bunch of functions to simulate the host
+// ****************************************************************************
 #[cfg(test)]
 pub(crate) mod test {
+    use super::alloc::vec::Vec;
     use super::allocator;
 
     // The below functions will only be compiled and available during tests,
