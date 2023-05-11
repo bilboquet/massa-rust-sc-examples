@@ -48,7 +48,11 @@ fn myalloc(size: u32) -> u32 {
             IS_SHARED_MEM_CONSUMED = false;
         }
 
-        SHARED_MEM = Vec::with_capacity(size as usize);
+        // MUST BE FILLED or at least respect the assert bellow else the size is
+        // lost between the host and the wasm module
+        SHARED_MEM = alloc::vec![0; size as usize];
+        assert_eq!(size as usize, SHARED_MEM.len());
+
         SHARED_MEM.as_ptr() as u32
     }
 }
@@ -92,6 +96,9 @@ pub(super) fn encode_length_prefixed(data: Vec<u8>) -> u32 {
         // allocate memory and bind it to our global buffer
         myalloc(buf_len);
 
+        // MUST CLEAR HERE because myalloc() fill the buffer
+        SHARED_MEM.clear();
+
         SHARED_MEM.extend(data_len.to_le_bytes());
         SHARED_MEM.extend(data);
 
@@ -108,7 +115,7 @@ pub(super) mod test {
 
     #[cfg(test)]
     // Function that writes the [u8] argument to SHARED_MEM
-    pub fn host_write_buffer(data: &[u8]) -> u32 {
+    pub(crate) fn host_write_buffer(data: &[u8]) -> u32 {
         let buf_ptr = myalloc(data.len().try_into().expect("size fit in u32"));
 
         unsafe {

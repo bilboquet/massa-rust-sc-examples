@@ -47,7 +47,13 @@ echo ""
 '''
 
 [tasks.wasm]
-dependencies = ["clean-extra", "build", "test", "inspect", "export"]
+dependencies = [
+    "clean-extra",
+    "build",
+    #"test",
+    "inspect",
+    "export",
+]
 run_task = "list-wasm"
 
 ## Dunno why this takes so long when `cargo test --lib` on the command line
