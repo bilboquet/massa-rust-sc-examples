@@ -19,6 +19,9 @@ prost-types = { version = "0.11.9", default-features = false }
 prost-build = "0.11.9" # specify exact version to ensure determinism
 glob = "0.3.1"
 
+[dev-dependencies]
+massa-rust-sc-sdk = { path = "../massa-rust-sc-sdk", features = ["testing"] }
+
 [features]
 prost-build = []
 
