@@ -1,21 +1,18 @@
 // ****************************************************************************
-// TODO: move in root module of the sdk
 #![no_std]
-mod sdk;
 // ****************************************************************************
 
-use crate::sdk::*;
+use massa_rust_sc_sdk as sdk;
+use sdk::{
+    abis::{echo::echo, log::log},
+    *,
+};
 
 #[cfg(not(test))]
 #[no_mangle]
 pub extern "C" fn main(_arg: i32) -> i32 {
     panic!("end");
 }
-
-use sdk::{
-    abis::{echo::echo, log::log},
-    encode_length_prefixed, get_parameters,
-};
 
 // ****************************************************************************
 // Function exposed by the SC low level interface to the host
