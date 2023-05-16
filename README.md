@@ -69,3 +69,14 @@ cargo make build -p <package_name>
 will build only `package_name`
 
 As each example contains its own `Makefile.toml` they should work (aka build) outside the workspace (not tested yet).
+
+
+# Code
+The sdk is `no_std`, this implies some manual imports from the `alloc` crate.
+For the shake of simplicity the sdk tries to reexport common structs / functions...
+If some are missing, for example `ToOwned`, it can be added manualy this way
+
+```rust
+extern crate alloc;
+use alloc::borrow::ToOwned;
+```
