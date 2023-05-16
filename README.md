@@ -20,6 +20,9 @@ File: .cargo/config.toml
 target = "wasm32-unknown-unknown"
 ```
 
+## candidate 3
+Set the target explicitly in `Makefile.toml` and build with `cargo make`
+
 ## build command
 We need a post build hook to prepend the `header` (0x01) to the produced `.wasm` file.
 AFAIK `cargo` does not have this feature. `cargo make` solves this problem in a simple way.
@@ -54,3 +57,15 @@ File: rust-toolchain.toml
 [toolchain]
 channel = "nightly-2023-02-27"
 ```
+
+```shell
+cargo make build
+```
+will build all examples
+
+```shell
+cargo make build -p <package_name>
+```
+will build only `package_name`
+
+As each example contains its own `Makefile.toml` they should work (aka build) outside the workspace (not tested yet).
