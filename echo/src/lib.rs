@@ -18,11 +18,11 @@ use sdk::abis::{echo, log};
 // SC can exposte a main function, but it is not required and it must be
 // preceded by #[cfg(not(test))] to avoid conflicts with the test runner
 // ****************************************************************************
-#[cfg(not(test))]
-#[no_mangle]
-pub extern "C" fn main(_arg: i32) -> i32 {
-    panic!("end");
-}
+// #[cfg(not(test))]
+// #[no_mangle]
+// pub extern "C" fn main(_arg: i32) -> i32 {
+//     panic!("end");
+// }
 
 // ****************************************************************************
 // Function exposed by the SC low level interface to the host

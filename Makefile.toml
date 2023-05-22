@@ -1,3 +1,6 @@
+[env]
+BUILD_TARGET = "wasm32-unknown-unknown"
+
 [tasks.format]
 install_crate = "rustfmt"
 command = "cargo"
@@ -15,26 +18,34 @@ args = ["-e", "wasm_add", "--exec", "rm"]
 
 [tasks.clippy]
 command = "cargo"
-args = ["clippy", "--target", "wasm32-unknown-unknown"]
+args = ["clippy", "--target", "${BUILD_TARGET}"]
 
 [tasks.build]
-dependencies = ["clippy"]
+# dependencies = ["clippy"]
 command = "cargo"
-args = ["build", "--target", "wasm32-unknown-unknown"]
+args = ["build", "--target", "${BUILD_TARGET}"]
 
 [tasks.inspect]
 dependencies = ["build"]
 command = "wasmer"
 args = [
     "inspect",
-    "./target/wasm32-unknown-unknown/debug/massa_rust_sc_examples.wasm",
+    "${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/${BUILD_TARGET}/debug/${CARGO_MAKE_CRATE_FS_NAME}.wasm",
+]
+
+[tasks.strip]
+dependencies = ["build"]
+command = "wasm-strip"
+args = [
+    "${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/${BUILD_TARGET}/debug/${CARGO_MAKE_CRATE_FS_NAME}.wasm",
 ]
 
 [tasks.export]
 dependencies = ["build"]
+# check if "echo -n -e \\x01 | cat - file.wasm > file.wasm_add" does the same and is portable
 command = "wasmv1_transform"
 args = [
-    "./target/wasm32-unknown-unknown/debug/massa_rust_sc_examples.wasm",
+    "${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/${BUILD_TARGET}/debug/${CARGO_MAKE_CRATE_FS_NAME}.wasm",
     "add",
 ]
 
@@ -42,7 +53,7 @@ args = [
 workspace = false
 script = '''
 echo "** wasmv1 files:"
-find . -name "*.wasm_add" -exec echo "    {}" \;
+find . -name "*.wasm_add" -exec ls -lh {} \;
 echo ""
 '''
 
@@ -51,6 +62,7 @@ dependencies = [
     "clean-extra",
     "build",
     #"test",
+    "strip",
     "inspect",
     "export",
 ]

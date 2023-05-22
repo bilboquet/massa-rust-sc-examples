@@ -18,7 +18,7 @@ use sdk::abis::{call, create_sc, generate_event, log, transfer_coins};
 // Simple Smart Contract that generate an event
 // ****************************************************************************
 
-fn create_contract() -> Result<String> {
+fn create_contract() -> Result<String, String> {
     // const bytes: StaticArray<u8> =
     // fileToByteArray("./build/release.wasm_add");
     let module = include_bytes!(concat!(
@@ -40,6 +40,8 @@ fn create_contract() -> Result<String> {
 
 #[no_mangle]
 fn main(_args: u32) -> u32 {
+    log("SC main".to_string());
+
     match create_contract() {
         Ok(sc_address) => {
             let _ret = call(
@@ -59,7 +61,7 @@ fn main(_args: u32) -> u32 {
     }
 
     // data MUST be returned this way
-    encode_length_prefixed(Vec::new())
+    encode_length_prefixed(vec![0xC, 0xA, 0xF, 0xE])
 }
 
 #[cfg(test)]

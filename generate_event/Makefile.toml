@@ -21,7 +21,7 @@ command = "cargo"
 args = ["clippy", "--target", "${BUILD_TARGET}"]
 
 [tasks.build]
-dependencies = ["clippy"]
+# dependencies = ["clippy"]
 command = "cargo"
 args = ["build", "--target", "${BUILD_TARGET}"]
 
@@ -30,6 +30,13 @@ dependencies = ["build"]
 command = "wasmer"
 args = [
     "inspect",
+    "${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/${BUILD_TARGET}/debug/${CARGO_MAKE_CRATE_FS_NAME}.wasm",
+]
+
+[tasks.strip]
+dependencies = ["build"]
+command = "wasm-strip"
+args = [
     "${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/${BUILD_TARGET}/debug/${CARGO_MAKE_CRATE_FS_NAME}.wasm",
 ]
 
@@ -44,7 +51,7 @@ args = [
 [tasks.list-wasm]
 script = '''
 echo "** wasmv1 files:"
-find . -name "*.wasm_add" -exec echo "    {}" \;
+find . -name "*.wasm_add" -exec ls -lh {} \;
 echo ""
 '''
 
@@ -53,6 +60,7 @@ dependencies = [
     "clean-extra",
     "build",
     #"test",
+    #"strip",
     "inspect",
     "export",
 ]

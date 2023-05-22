@@ -1,5 +1,31 @@
 Examples of how to use massa-rust-sc-sdk
 
+
+# Workaround
+cargo make does not seems to enforce build order from `workspace.members` so one has to do:
+```
+cd generate_event && cargo make wasm --no-workspace
+```
+first.
+
+# Dependencies
+
+In the project directory (so the target is added to the current toolchain), run:
+
+```
+rustup target add wasm32-unknown-unknown
+```
+
+```
+cargo install wasmer-cli  --features cranelift
+```
+
+```
+wasm-strip
+wasm-opt (apt install bunaryen)
+         (cargo install wasm-opt --locked)
+```
+
 # Build
 
 ## candidate 1
